@@ -13,7 +13,7 @@ define(['ojs/ojcore', 'knockout', 'jquery',
     'ojs/ojlistview', 'ojs/ojdatacollection-common'],
     function (oj, ko, $) {
         /**
-         * The view model for the primary globe content view template
+         * The view model for the settings content view template
          */
         function settingsViewModel() {
 //            var manager = controller.model.weatherScoutManager;
