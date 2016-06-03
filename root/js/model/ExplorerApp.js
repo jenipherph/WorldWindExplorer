@@ -9,26 +9,25 @@
 
 /**
  * Web Application.
- * 
- * @param {OracleJet} oj 
- * @param {KnockOut} ko 
- * @param {JQuery} $  
+ *
+ * @param {OracleJet} oj
+ * @param {KnockOut} ko
+ * @param {JQuery} $
  * @param {Earth} Earth The globe.
  * @param {Explorer} explorer Constants.
- * 
+ *
  * @returns {ExplorerApp}
- * 
+ *
  * @author Bruce Schubert
  */
 define([
-    'ojs/ojcore', 'knockout', 'jquery',
-    'model/earth/Earth',
-    'model/Explorer'
-],
-    function (
-        oj, ko, $,
-        Earth,
-        explorer) {
+        'ojs/ojcore', 'knockout', 'jquery',
+        'model/earth/Earth',
+        'model/Explorer'
+    ],
+    function (oj, ko, $,
+              Earth,
+              explorer) {
         "use strict";
         var ExplorerApp = function () {
 
@@ -42,20 +41,45 @@ define([
                 includeTiltControls: true,
                 includeZoomControls: true,
                 includeExaggerationControls: explorer.configuration.showExaggerationControl,
-                includeFieldOfViewControls: explorer.configuration.showFiewOfViewControl};
+                includeFieldOfViewControls: explorer.configuration.showFieldOfViewControl
+            };
 
 
-            // Create the primary globe associated with an HTML5 canvas
-            this.earth = new Earth("canvasOne", globeOptions);
+            // Create the explorer's primary globe that's associated with the specified HTML5 canvas
+            explorer.earth = new Earth("canvasOne", globeOptions);
 
             // Configure the Earth's layers
-            this.earth.layerManager.addBaseLayer(new WorldWind.BMNGLayer(), {enabled: true, hideInMenu: true, detailHint: explorer.configuration.imageryDetailHint});            
-            this.earth.layerManager.addBaseLayer(new WorldWind.BMNGLandsatLayer(), {enabled: false, detailHint: explorer.configuration.imageryDetailHint});
-            this.earth.layerManager.addBaseLayer(new WorldWind.BingAerialWithLabelsLayer(null), {enabled: false, detailHint: explorer.configuration.imageryDetailHint});
-            this.earth.layerManager.addBaseLayer(new WorldWind.BingRoadsLayer(null), {enabled: false, opacity: 0.7, detailHint: explorer.configuration.imageryDetailHint});
-            this.earth.layerManager.addBaseLayer(new WorldWind.OpenStreetMapImageLayer(null), {enabled: true, opacity: 0.7, detailHint: explorer.configuration.imageryDetailHint});
-            this.earth.layerManager.addDataLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_MARKERS), {enabled: true, pickEnabled: true});
-            this.earth.layerManager.addWidgetLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_WIDGETS), {enabled: true, pickEnabled: false});
+            explorer.earth.layerManager.addBaseLayer(new WorldWind.BMNGLayer(), {
+                enabled: true,
+                hideInMenu: true,
+                detailHint: explorer.configuration.imageryDetailHint
+            });
+            explorer.earth.layerManager.addBaseLayer(new WorldWind.BMNGLandsatLayer(), {
+                enabled: false,
+                detailHint: explorer.configuration.imageryDetailHint
+            });
+            explorer.earth.layerManager.addBaseLayer(new WorldWind.BingAerialWithLabelsLayer(null), {
+                enabled: false,
+                detailHint: explorer.configuration.imageryDetailHint
+            });
+            explorer.earth.layerManager.addBaseLayer(new WorldWind.BingRoadsLayer(null), {
+                enabled: false,
+                opacity: 0.7,
+                detailHint: explorer.configuration.imageryDetailHint
+            });
+            explorer.earth.layerManager.addBaseLayer(new WorldWind.OpenStreetMapImageLayer(null), {
+                enabled: true,
+                opacity: 0.7,
+                detailHint: explorer.configuration.imageryDetailHint
+            });
+            explorer.earth.layerManager.addDataLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_MARKERS), {
+                enabled: true,
+                pickEnabled: true
+            });
+            explorer.earth.layerManager.addWidgetLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_WIDGETS), {
+                enabled: true,
+                pickEnabled: false
+            });
 
 
             // Now that the globe is setup, initialize the Model-View-Controller framework.
