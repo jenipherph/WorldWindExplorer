@@ -31,9 +31,9 @@
 /*global define, $, WorldWind */
 
 /**
- * The Earth module manages the WorldWindow object and add capabilities to the globe not found in the 
+ * The Earth module manages the WorldWindow object and add capabilities to the globe not found in the
  * Web World Wind library.
- * 
+ *
  * @param {DnDController} DnDController Drag-N-Drop controller.
  * @param {EnhancedLookAtNavigator} EnhancedLookAtNavigator Doesn't allow the eye pos to go below the terrain.
  * @param {EnhancedTextSupport} EnhancedTextSupport Provides outline text.
@@ -49,43 +49,42 @@
  * @param {Wmt} explorer Constants.
  * @param {WorldWind} ww
  * @returns {Earth}
- * 
+ *
  * @author Bruce Schubert
  */
 define([
-    'model/earth/DnDController',
-    'model/earth/EnhancedLookAtNavigator',
-    'model/earth/EnhancedTextSupport',
-    'model/earth/layers/EnhancedViewControlsLayer',
-    'model/earth/KeyboardControls',
-    'model/earth/LayerManager',
-    'model/util/Log',
-    'model/earth/layers/ReticuleLayer',
-    'model/earth/SelectController',
-    'model/earth/layers/SkyBackgroundLayer',
-    'model/earth/Terrain',
-    'model/earth/TerrainProvider',
-    'model/earth/Viewpoint',
-    'model/util/WmtUtil',
-    'model/Explorer',
-    'worldwind'],
-    function (
-        DnDController,
-        EnhancedLookAtNavigator,
-        EnhancedTextSupport,
-        EnhancedViewControlsLayer,
-        KeyboardControls,
-        LayerManager,
-        log,
-        ReticuleLayer,
-        SelectController,
-        SkyBackgroundLayer,
-        Terrain,
-        TerrainProvider,
-        Viewpoint,
-        util,
-        explorer,
-        ww) {
+        'model/earth/DnDController',
+        'model/earth/EnhancedLookAtNavigator',
+        'model/earth/EnhancedTextSupport',
+        'model/earth/layers/EnhancedViewControlsLayer',
+        'model/earth/KeyboardControls',
+        'model/earth/LayerManager',
+        'model/util/Log',
+        'model/earth/layers/ReticuleLayer',
+        'model/earth/SelectController',
+        'model/earth/layers/SkyBackgroundLayer',
+        'model/earth/Terrain',
+        'model/earth/TerrainProvider',
+        'model/earth/Viewpoint',
+        'model/util/WmtUtil',
+        'model/Explorer',
+        'worldwind'],
+    function (DnDController,
+              EnhancedLookAtNavigator,
+              EnhancedTextSupport,
+              EnhancedViewControlsLayer,
+              KeyboardControls,
+              LayerManager,
+              log,
+              ReticuleLayer,
+              SelectController,
+              SkyBackgroundLayer,
+              Terrain,
+              TerrainProvider,
+              Viewpoint,
+              util,
+              explorer,
+              ww) {
         "use strict";
         /**
          * Creates a Earth object which manages a WorldWindow object created for the given canvas.
@@ -370,19 +369,19 @@ define([
             this.wwd.redraw();
         };
 
-        /** 
+        /**
          * Redraws the globe.
          */
         Earth.prototype.redraw = function () {
             this.wwd.redraw();
         };
 
-        /** 
+        /**
          * Refreshes temporal layers.
          */
         Earth.prototype.refreshLayers = function () {
             var i, len, layer;
-            
+
             // Process TiledImageLayers
             for (i = 0, len = this.wwd.layers.length; i < len; i++) {
                 layer = this.wwd.layers[i];
@@ -391,7 +390,7 @@ define([
                 }
                 this.wwd.redraw();
             }
-            
+
         };
 
 

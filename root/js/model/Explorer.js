@@ -9,7 +9,7 @@
 
 /**
  * Explorer Configuration and constants
- * 
+ *
  * @author Bruce Schubert
  */
 define([],

@@ -4,184 +4,186 @@
  The MIT License: http://www.opensource.org/licenses/mit-license.php
 -->
 <html lang="en-us">
-    <head>
-        <title>World Wind Explorer</title>
-        <meta charset="UTF-8">
-        <meta name="description" content="World Wind Explorer">
-        <meta name="author" content="Bruce Schubert">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" href="css/images/favicon.ico" type="image/x-icon" />
+<head>
+    <title>World Wind Explorer</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="World Wind Explorer">
+    <meta name="author" content="Bruce Schubert">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="css/images/favicon.ico" type="image/x-icon"/>
 
-        <!-- Favicon -->
-        <link rel="icon" type="image/png" href="css/images/nasa-logo_32.png" />
-        
-        <!-- Oracle's Alta theme provides the main styling -->
-        <link rel="stylesheet" href="css/libs/oj/v2.0.1/alta/oj-alta-min.css" type="text/css"/>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="css/images/nasa-logo_32.png"/>
 
-        <!-- Font Awesome provides the icons -->
-        <link rel="stylesheet" href="css/libs/fa/font-awesome.min.css" type="text/css"/>
+    <!-- Oracle's Alta theme provides the main styling -->
+    <link rel="stylesheet" href="css/libs/oj/v2.0.1/alta/oj-alta-min.css" type="text/css"/>
 
-        <!-- Custom application specific styling -->
-        <link rel="stylesheet" href="css/override.css" type="text/css"/>
+    <!-- Font Awesome provides the icons -->
+    <link rel="stylesheet" href="css/libs/fa/font-awesome.min.css" type="text/css"/>
 
-        <!-- RequireJS configuration file -->
-        <script data-main="js/main" src="js/libs/require/require.js"></script>
-    </head>
-    <body>
+    <!-- Custom application specific styling -->
+    <link rel="stylesheet" href="css/override.css" type="text/css"/>
 
-        <!-- This script is a template for rendering navigation items shared between "nav bar" and "nav drawer" -->
-        <script type="text/html" id="navTemplate">
-            <!--Load the name and icon from data binding-->
-            <li><a href="#">
-                <span data-bind="css: $data['iconClass']"></span>
-                <!--Using Knockout containerless control flow for the name-->
-                <!-- ko text: $data['name'] --> <!--/ko-->
-            </a></li>
-        </script>
+    <!-- RequireJS configuration file -->
+    <script data-main="js/main" src="js/libs/require/require.js"></script>
+</head>
+<body>
 
-        <!--See http://www.oracle.com/webfolder/technetwork/jet/stylingdoc.html#web-->
-        
-    <div id="globalBody" class="oj-web-applayout-offcanvas-wrapper oj-offcanvas-outer-wrapper">
-        <div class="oj-offcanvas-inner-wrapper">
-            
-            <!-- 
-            This off-canvas section is used when the browser is resized to a medium
-            or smaller media query size. It moves the App Navigation into a drawer
-            -->
-            <div id="offcanvas" class="oj-contrast-marker oj-web-applayout-offcanvas oj-offcanvas-start"
-                 data-bind="ojModule: {viewName: 'navDrawer'}">
-            </div>
+<!-- This script is a template for rendering navigation items shared between "nav bar" and "nav drawer" -->
+<script type="text/html" id="navTemplate">
+    <!--Load the name and icon from data binding-->
+    <li><a href="#">
+        <span data-bind="css: $data['iconClass']"></span>
+        <!--Using Knockout containerless control flow for the name-->
+        <!-- ko text: $data['name'] --> <!--/ko-->
+    </a></li>
+</script>
 
-            
-            <div class="oj-web-applayout-scrollable-wrapper">
-                <div class="oj-web-applayout-scrollable oj-web-applayout-page">
-                    <!-- 
-                    Header section which contains the Global Branding, Global Navigation,
-                    and Application Navigation code. 
-                    -->
-                    <header role="banner" class="oj-web-applayout-header" >
-                        <div class="oj-flex-bar oj-sm-align-items-center">
-                            
-                            <!--
-                            Off-canvas toggle button
-                            -->
-                            <div class="oj-flex-bar-start oj-md-hide">
-                                <button class="oj-button-lg" 
-                                        data-bind="click: toggleDrawer,
+<!--See http://www.oracle.com/webfolder/technetwork/jet/stylingdoc.html#web-->
+
+<div id="globalBody" class="oj-web-applayout-offcanvas-wrapper oj-offcanvas-outer-wrapper">
+    <div class="oj-offcanvas-inner-wrapper">
+
+        <!--
+        This off-canvas section is used when the browser is resized to a medium
+        or smaller media query size. It moves the App Navigation into a drawer
+        -->
+        <div id="offcanvas" class="oj-contrast-marker oj-web-applayout-offcanvas oj-offcanvas-start"
+             data-bind="ojModule: {viewName: 'navDrawer'}">
+        </div>
+
+
+        <div class="oj-web-applayout-scrollable-wrapper">
+            <div class="oj-web-applayout-scrollable oj-web-applayout-page">
+                <!--
+                Header section which contains the Global Branding, Global Navigation,
+                and Application Navigation code.
+                -->
+                <header role="banner" class="oj-web-applayout-header">
+                    <div class="oj-flex-bar oj-sm-align-items-center">
+
+                        <!--
+                        Off-canvas toggle button
+                        -->
+                        <div class="oj-flex-bar-start oj-md-hide">
+                            <button class="oj-button-lg"
+                                    data-bind="click: toggleDrawer,
                                         ojComponent: {
                                             component:'ojButton', 
                                             label: 'Application Navigation',
                                             chroming: 'half', 
                                             display: 'icons', 
                                             icons: {start: 'oj-web-applayout-offcanvas-icon'}}">
-                                </button>
-                            </div>
-                            
-                            <!--
-                            Branding. 
-                            The OracleJET QuickStart template places this section in the 
-                            header.html, I moved it to index.html so that the branding displays 
-                            right away, during the application startup.
-                            -->
-                            <div class = "oj-flex-bar-middle oj-sm-align-items-center">
-                                <span role="img" class="oj-sm-only-hide oj-icon branding-icon" title="NASA Logo"></span>
-                                <span class="oj-web-applayout-header-title" title="Application Name">World Wind Explorer</span>
-                            </div>
-                            
-                            <!--
-                            Toolbar menu buttons
-                            -->
-                            <div class="oj-flex-bar-end" data-bind="ojModule: 'header'"></div>
+                            </button>
                         </div>
-                    </header>
 
-                    <!-- This is where your main page content will be loaded -->
-                    <div class="oj-web-applayout-content">
-                        <div class="oj-flex">
-                            <!--
-                            Main Sidebar
-                            -->
-                            <div class="oj-xl-3 oj-lg-3 oj-sm-12 oj-flex-item oj-flex">
-                                <div id="mainContent" role="main" class="oj-panel oj-margin oj-flex-item"
-                                     data-bind="ojModule: router.moduleConfig">
-                                    <!-- 
-                                    ** This ojModule binding is using "name" instead of "viewName".
-                                    ** See the router configuration RootViewModel in main.js.
-                                    ** When the "name" option is specified, ojModule expects that
-                                    ** the View and the ViewModel share the same base name.
-                                    ** The "viewName" option is used when the View does not have
-                                    ** an associated ViewModel or when the ViewModel has a different base name.
-                                    -->
-                                </div>
+                        <!--
+                        Branding.
+                        The OracleJET QuickStart template places this section in the
+                        header.html, I moved it to index.html so that the branding displays
+                        right away, during the application startup.
+                        -->
+                        <div class="oj-flex-bar-middle oj-sm-align-items-center">
+                            <span role="img" class="oj-sm-only-hide oj-icon branding-icon" title="NASA Logo"></span>
+                            <span class="oj-web-applayout-header-title"
+                                  title="Application Name">World Wind Explorer</span>
+                        </div>
+
+                        <!--
+                        Toolbar menu buttons
+                        -->
+                        <div class="oj-flex-bar-end" data-bind="ojModule: 'header'"></div>
+                    </div>
+                </header>
+
+                <!-- This is where your main page content will be loaded -->
+                <div class="oj-web-applayout-content">
+                    <div class="oj-flex">
+                        <!--
+                        Main Sidebar
+                        -->
+                        <div class="oj-xl-3 oj-lg-3 oj-sm-12 oj-flex-item oj-flex">
+                            <div id="mainContent" role="main" class="oj-panel oj-margin oj-flex-item"
+                                 data-bind="ojModule: router.moduleConfig">
+                                <!--
+                                ** This ojModule binding is using "name" instead of "viewName".
+                                ** See the router configuration RootViewModel in main.js.
+                                ** When the "name" option is specified, ojModule expects that
+                                ** the View and the ViewModel share the same base name.
+                                ** The "viewName" option is used when the View does not have
+                                ** an associated ViewModel or when the ViewModel has a different base name.
+                                -->
                             </div>
-                            <!--/Main Sidebar-->
+                        </div>
+                        <!--/Main Sidebar-->
 
-                            <!--
-                            Globe and supporting sections
-                            TODO: Add search bar
-                            TODO: Add marker button/palette
-                            TODO: Add Timeline section
-                            -->
-                            <div class="oj-sm-12 oj-lg-9 oj-col">
-                                <div class='oj-row'>
-                                    <div class="oj-sm-12 oj-md-9 oj-col"> 
-                                        <!--
-                                        Globe
-                                        -->
-                                        <div role="region" class="oj-panel oj-margin">
-                                            <h1><span class="fa fa-globe fa-lg" aria-hidden="true" style="padding-right:5px;"></span>
-                                                Globe
-                                                <!-- 
-                                                The globe's tool bar
-                                                -->
+                        <!--
+                        Globe and supporting sections
+                        TODO: Add search bar
+                        TODO: Add marker button/palette
+                        TODO: Add Timeline section
+                        -->
+                        <div class="oj-sm-12 oj-lg-9 oj-col">
+                            <div class='oj-row'>
+                                <div class="oj-sm-12 oj-md-9 oj-col">
+                                    <!--
+                                    Globe
+                                    -->
+                                    <div role="region" class="oj-panel oj-margin">
+                                        <h1><span class="fa fa-globe fa-lg" aria-hidden="true"
+                                                  style="padding-right:5px;"></span>
+                                            Globe
+                                            <!--
+                                            The globe's tool bar
+                                            -->
                                                 <span class="interactive" style='float: right;'>
                                                 </span>
-                                            </h1>
-                                            
-                                            <!-- 
-                                            WorldWindow 
-                                            -->
-                                            <div class="noselect" id="worldwindow" style="height: 70vh">
-                                                <!--Set canvas' tab index so keydown events can be captured.-->
-                                                <canvas id="canvasOne" tabindex="1" style="width: 100%; height: 100%"> 
-                                                    <!--The h2 content is displayed if the browser doesn't support an HTML5 canvas-->
-                                                    <h2>Use the latest Chrome or Firefox browsers.</h2>
-                                                </canvas> 
-                                            </div>
-                                            
-                                            <!--
-                                            Timeline
-                                            -->
-                                            <div>
-                                                <h1>Timeline</h1>
-                                            </div>
-                                        </div>
-                                        <!--/Globe-->
-                                    </div>
-                                    <div class="oj-sm-12 oj-md-3 oj-col"> 
+                                        </h1>
+
                                         <!--
-                                        Properties:
-                                        This section is used for displaying the properties of the selected item.
-                                        This ojModule binding is using "name" instead of "viewName". 
-                                        This tells the binding to look for and load the JavaScript 
-                                        module of the same name, before loading the view template file.  
+                                        WorldWindow
                                         -->
-                                        <div role="complementary" class="oj-panel oj-margin">
-                                            <div id="propertiesContent" style="height: 70vh" data-bind="ojModule: { name: 'properties'}"></div>
+                                        <div class="noselect" id="worldwindow" style="height: 70vh">
+                                            <!--Set canvas' tab index so keydown events can be captured.-->
+                                            <canvas id="canvasOne" tabindex="1" style="width: 100%; height: 100%">
+                                                <!--The h2 content is displayed if the browser doesn't support an HTML5 canvas-->
+                                                <h2>Use the latest Chrome or Firefox browsers.</h2>
+                                            </canvas>
+                                        </div>
+
+                                        <!--
+                                        Timeline
+                                        -->
+                                        <div>
+                                            <h1>Timeline</h1>
                                         </div>
                                     </div>
-                                    <div class="oj-sm-12 oj-col"> 
-                                        <!--
-                                        Details:
-                                        This section is usually used for the selected item details. 
-                                        Using the ojModule binding to load the specific HTML template
-                                        that will be shown on the page. Using the "viewName" option 
-                                        just loads the HTML template while binding it to the existing 
-                                        global viewmodel. 
-                                        -->
-                                        <div role="complementary" class="oj-panel oj-margin">
-                                            <div id="detailsContent" data-bind="ojModule: { viewName: 'details'}"></div>
-                                        </div>
+                                    <!--/Globe-->
+                                </div>
+                                <div class="oj-sm-12 oj-md-3 oj-col">
+                                    <!--
+                                    Properties:
+                                    This section is used for displaying the properties of the selected item.
+                                    This ojModule binding is using "name" instead of "viewName".
+                                    This tells the binding to look for and load the JavaScript
+                                    module of the same name, before loading the view template file.
+                                    -->
+                                    <div role="complementary" class="oj-panel oj-margin">
+                                        <div id="propertiesContent" style="height: 70vh"
+                                             data-bind="ojModule: { name: 'properties'}"></div>
+                                    </div>
+                                </div>
+                                <div class="oj-sm-12 oj-col">
+                                    <!--
+                                    Details:
+                                    This section is usually used for the selected item details.
+                                    Using the ojModule binding to load the specific HTML template
+                                    that will be shown on the page. Using the "viewName" option
+                                    just loads the HTML template while binding it to the existing
+                                    global viewmodel.
+                                    -->
+                                    <div role="complementary" class="oj-panel oj-margin">
+                                        <div id="detailsContent" data-bind="ojModule: { viewName: 'details'}"></div>
                                     </div>
                                 </div>
                             </div>
@@ -191,5 +193,6 @@
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>
