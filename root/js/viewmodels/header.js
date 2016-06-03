@@ -17,8 +17,8 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'ojs/ojknockout', 'ojs/ojdialog',
       var self = this;
 
       // Application Name used in Branding Area
-      self.appName = ko.observable("Wildfire Management Tool");
-      self.appShortName = ko.observable("WMT");
+      self.appName = ko.observable("World Wind Explorer");
+      self.appShortName = ko.observable("Explorer");
 
       // User Info used in Global Navigation area
       self.userLogin = ko.observable("Guest");
