@@ -19,7 +19,7 @@ define([
     'model/Explorer',
     'worldwind'],
     function (
-        wmt,
+        explorer,
         ww) {
         "use strict";
         /**
@@ -83,7 +83,7 @@ define([
             WorldWind.Layer.call(this, "View Controls");
 
             // Set defaults from configuration
-            this.orientation = wmt.configuration.viewControlOrientation;
+            this.orientation = explorer.configuration.viewControlOrientation;
 
 
             /**
@@ -189,9 +189,9 @@ define([
             this.fovWideControl = new WorldWind.ScreenImage(screenOffset.clone(), imagePath + "view-fov-wide-32x32.png");
 
             // Configurable controls
-            this.panControl.enabled = wmt.configuration.showPanControl;
-            this.exaggerationUpControl.enabled = wmt.configuration.showExaggerationControl;
-            this.exaggerationDownControl.enabled = wmt.configuration.showExaggerationControl;
+            this.panControl.enabled = explorer.configuration.showPanControl;
+            this.exaggerationUpControl.enabled = explorer.configuration.showExaggerationControl;
+            this.exaggerationDownControl.enabled = explorer.configuration.showExaggerationControl;
 
             // Disable the FOV controls by default.
             this.fovNarrowControl.enabled = false;
