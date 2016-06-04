@@ -66,15 +66,17 @@ require(['ojs/ojcore', 'knockout', 'jquery', 'model/Constants','model/Explorer',
         'ojs/ojknockout', 'ojs/ojrouter', 'ojs/ojmodule', 'ojs/ojoffcanvas', 'ojs/ojnavigationlist', 'ojs/ojarraytabledatasource'],
     function (oj, ko, $, constants, explorer, app, ww) { // this callback gets executed when all required modules are loaded
 
-        // Specify the where the World Wind resources are located.
-        ww.configuration.baseUrl = constants.WORLD_WIND_PATH;
+        // Specify the where the World Wind lirary are located.
+        ww.configuration.baseUrl = 'http://worldwindserver.net/webworldwind/';
         // Set the logging level for the World Wind library
         ww.Logger.setLoggingLevel(ww.Logger.LEVEL_WARNING);
 
         // Override the ModuleBinding defaults to conform to this project's directory structure
         oj.ModuleBinding.defaults.modelPath = 'viewmodels/'; // the original is 'viewModels'
 
-        // Retrieve the router static instance and configure the states.
+        // Retrieve the router static instance and configure the router states.
+        // The mainContent section is using an ojModule.moduleConfig binding to load
+        // the view/viewModels with the same names as the router state.
         var router = oj.Router.rootInstance;
         router.configure({
             'location': {label: 'Location', isDefault: true},
@@ -100,16 +102,16 @@ require(['ojs/ojcore', 'knockout', 'jquery', 'model/Constants','model/Explorer',
             // Store the router's nav data an ArrayTableDataSource
             self.navDataSource = new oj.ArrayTableDataSource(navData, {idAttribute: 'id'});
 
-
+            // Create observable media queries to implement responsive behaviors
             var smQuery = oj.ResponsiveUtils.getFrameworkQuery(oj.ResponsiveUtils.FRAMEWORK_QUERY_KEY.SM_ONLY);
             var mdQuery = oj.ResponsiveUtils.getFrameworkQuery(oj.ResponsiveUtils.FRAMEWORK_QUERY_KEY.MD_UP);
             self.smScreen = oj.ResponsiveKnockoutUtils.createMediaQueryObservable(smQuery);
             self.mdScreen = oj.ResponsiveKnockoutUtils.createMediaQueryObservable(mdQuery);
 
             /**
-             * Toggles between the the nav bar and and nav drawer.
-             * @param {type} event Not used.
-             * @param {type} ui
+             * Toggles between the nav bar and and the nav drawer.
+             * @param {Object} event Not used.
+             * @param {Object} ui
              */
             self.navChange = function (event, ui) {
                 if (ui.option === 'selection' && ui.value !== self.router.stateId()) {
@@ -120,15 +122,14 @@ require(['ojs/ojcore', 'knockout', 'jquery', 'model/Constants','model/Explorer',
                 }
             };
 
-            // Parameters used by toggleDrawer.
+            // Parameters used by toggleDrawer, and mdScreen below.
             self.drawerParams = {
                 displayMode: 'push',
                 selector: '#offcanvas',
             };
-
             /**
              * Toggles the nav drawer. Called by navigation drawer
-             * toggle button and after selection of a nav drawer item.
+             * toggle button and after the selection of a nav drawer item.
              */
             self.toggleDrawer = function () {
                 return oj.OffcanvasUtils.toggle(self.drawerParams);
@@ -138,6 +139,8 @@ require(['ojs/ojcore', 'knockout', 'jquery', 'model/Constants','model/Explorer',
             self.mdScreen.subscribe(function () {
                 oj.OffcanvasUtils.close(self.drawerParams);
             });
+
+            // TODO: subscribe to the responsive utils to change the name of the app from long name to short name.
         }
 
         oj.Router.defaults['urlAdapter'] = new oj.Router.urlParamAdapter();
