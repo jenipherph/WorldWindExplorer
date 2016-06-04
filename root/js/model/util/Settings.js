@@ -1,75 +1,46 @@
 /* 
- * Copyright (c) 2015, Bruce Schubert <bruce@emxsys.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     - Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *
- *     - Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *
- *     - Neither the name of Bruce Schubert,  nor the names of its 
- *       contributors may be used to endorse or promote products derived
- *       from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2016 Bruce Schubert.
+ * The MIT License
+ * http://www.opensource.org/licenses/mit-license
  */
 
 /*global define, WorldWind */
 
 /**
- * The Settings module is responsible for saving and restoring the globe view between sessions.
-
- *  * @author Bruce Schubert
- * 
- * @param {Log} Log
- * @param {Explorer} explorer
+ * The Settings singleton is responsible for saving and restoring the Explorer view between sessions.
+ *
+ * @param {Log} log
+ *
  * @returns {Settings}
+ *
+ * @author Bruce Schubert
  */
-define([
-    'model/util/Log',
-    'model/Explorer'],
-    function (
-        Log,
-        explorer) {
+define(['model/util/Log'],
+    function (log) {
         "use strict";
         var Settings = {
-            
-            STARTUP_LATITUDE_KEY:  "startupLatitude",
-            STARTUP_LONGITUDE_KEY:  "startupLongitude",
-            STARTUP_ALTITUDE_KEY:  "startupAltitude",
-            STARTUP_ROLL_KEY:  "startupRoll",
-            STARTUP_TILT_KEY:  "startupTilt",
-            STARTUP_HEADING_KEY:  "startupHeading",
+            STARTUP_LATITUDE_KEY: "startupLatitude",
+            STARTUP_LONGITUDE_KEY: "startupLongitude",
+            STARTUP_ALTITUDE_KEY: "startupAltitude",
+            STARTUP_ROLL_KEY: "startupRoll",
+            STARTUP_TILT_KEY: "startupTilt",
+            STARTUP_HEADING_KEY: "startupHeading",
             /**
-             * 
-             * @param {Controller} controller
+             * Saves the Explorer session settings to the persistent store.
+             * @param {Explorer} explorer
              */
-            saveSessionSettings: function (controller) {
+            saveSessionSettings: function (explorer) {
                 if (!window.localStorage) {
-                    Log.warning("Settings", "saveSessionSettings", "Local Storage is not supported!");
+                    log.warning("Settings", "saveSessionSettings", "Local Storage is not supported!");
                     return;
                 }
 
-                var target = controller.getTargetTerrain(),
+                var target = explorer.getTargetTerrain(),
                     pos = new WorldWind.Location(target.latitude, target.longitude), // controller.wwd.navigator.lookAtLocation,
-                    alt = controller.wwd.navigator.range,
-                    heading = controller.wwd.navigator.heading,
-                    tilt = controller.wwd.navigator.tilt,
-                    roll = controller.wwd.navigator.roll;
+                    alt = explorer.wwd.navigator.range,
+                    heading = explorer.wwd.navigator.heading,
+                    tilt = explorer.wwd.navigator.tilt,
+                    roll = explorer.wwd.navigator.roll;
 
                 // Save the eye position
                 localStorage.setItem(this.STARTUP_LATITUDE_KEY, pos.latitude);
@@ -83,13 +54,13 @@ define([
 
             },
             /**
-             * 
-             * @param {Controller} controller
+             * Restores the Explorer's session settings from the persistent store.
+             * @param {Explorer} explorer
              */
-            restoreSessionSettings: function (controller) {
+            restoreSessionSettings: function (explorer) {
                 try {
                     if (!localStorage) {
-                        Log.warning("Settings", "restoreSessionSettings", "Local Storage is not enabled!");
+                        log.warning("Settings", "restoreSessionSettings", "Local Storage is not enabled!");
                         return;
                     }
                     var lat = Number(localStorage.getItem(this.STARTUP_LATITUDE_KEY)),
@@ -100,28 +71,28 @@ define([
                         roll = Number(localStorage.getItem(this.STARTUP_ROLL_KEY));
 
                     if (isNaN(lat) || isNaN(lon)) {
-                        Log.warning("Settings", "restoreSessionSettings", "Previous state invalid: Using default lat/lon.");
+                        log.warning("Settings", "restoreSessionSettings", "Previous state invalid: Using default lat/lon.");
                         lat = explorer.configuration.startupLatitude;
                         lon = explorer.configuration.startupLongitude;
                     }
                     if (isNaN(alt)) {
-                        Log.warning("Settings", "restoreSessionSettings", "Previous state invalid: Using default altitude.");
+                        log.warning("Settings", "restoreSessionSettings", "Previous state invalid: Using default altitude.");
                         alt = explorer.configuration.startupAltitude;
                     }
                     if (isNaN(head) || isNaN(tilt) || isNaN(roll)) {
-                        Log.warning("Settings", "restoreSessionSettings", "Previous state invalid: Using default view angles.");
+                        log.warning("Settings", "restoreSessionSettings", "Previous state invalid: Using default view angles.");
                         head = explorer.configuration.startupHeading;
                         tilt = explorer.configuration.startupTilt;
                         roll = explorer.configuration.startupRoll;
                     }
-                    
+
                     // Initiate animation to target
-                    // The animation routine does a better job of 
+                    // The animation routine does a better job of
                     // preparing the map layers than does setting
                     // the view of the target (below) because it
                     // drills down through the various levels-of detail.
-                    controller.lookAtLatLon(lat, lon, alt);
-                    
+                    explorer.lookAtLatLon(lat, lon, alt);
+
                     // Restore view of target
                     // This routine doesn't always load the map level-of-detail
                     // appropriate for low alitudes. And you can't call this
@@ -133,14 +104,14 @@ define([
 //                    controller.wwd.navigator.tilt = tilt;
 //                    controller.wwd.navigator.roll = roll;
 //                    controller.wwd.redraw();
-                    
+
                 } catch (e) {
-                    Log.error("Settings", "restoreSessionSettings",
+                    log.error("Settings", "restoreSessionSettings",
                         "Exception occurred processing cookie: " + e.toString());
                 }
-
             }
         };
+
         return Settings;
     }
 );
