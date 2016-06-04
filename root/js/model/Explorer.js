@@ -10,9 +10,9 @@
  * Explorer singleton and constants.
  *
  * @param {Constants} constants singleton
+ * @param {EarthModel} Model module
  * @param {Log} log singleton
  * @param {Messenger} messenger singleton
- * @param {Model} Model module
  * @param {Settings} settings singleton
  * @param {WorldWind} ww
  *
@@ -21,15 +21,15 @@
  * @author Bruce Schubert
  */
 define(['model/Constants',
+        'model/earth/EarthModel',
         'model/util/Log',
         'model/util/Messenger',
-        'model/Model',
         'model/util/Settings',
         'worldwind'],
     function (constants,
+              EarthModel,
               log,
               messenger,
-              Model,
               settings) {
         "use strict";
         /**
@@ -55,8 +55,8 @@ define(['model/Constants',
                 this.goToAnimator = new WorldWind.GoToAnimator(this.wwd);
                 this.isAnimating = false;
 
-                // Create the MVC Model on the primary globe
-                this.model = new Model(this.earth);
+                // Create the EarthModel on the primary globe
+                this.earthModel = new EarthModel(this.earth);
 
                 // Internal. Intentionally not documented.
                 this.updateTimeout = null;
@@ -136,8 +136,8 @@ define(['model/Constants',
                 // TODO: Eye Position a property of the model
                 // 
                 var self = this,
-                    eyeAltMsl = this.model.viewpoint.eye.altitude,
-                    eyePosGrdElev = this.earth.terrainProvider.elevationAtLatLon(this.model.viewpoint.eye.latitude, this.model.viewpoint.eye.longitude),
+                    eyeAltMsl = this.earthModel.viewpoint.eye.altitude,
+                    eyePosGrdElev = this.earth.terrainProvider.elevationAtLatLon(this.earthModel.viewpoint.eye.latitude, this.earthModel.viewpoint.eye.longitude),
                     tgtPosElev = this.earth.terrainProvider.elevationAtLatLon(latitude, longitude),
                     eyeAltAgl = eyeAltitude || Math.max(eyeAltMsl - eyePosGrdElev, 100),
                     tgtEyeAltMsl = Math.max(tgtPosElev + eyeAltAgl, 100);
@@ -157,14 +157,14 @@ define(['model/Constants',
              * @param {Date} date
              */
             changeDateTime: function (date) {
-                this.model.updateAppTime(date);
+                this.earthModel.updateAppTime(date);
             },
             /**
              * Updates the model with the an adjusted time (+/- minutues).
              * @param {Number} minutes The number of minutes (+/-) added or subtracted from the current application time.
              */
             incrementDateTime: function (minutes) {
-                var msCurrent = this.model.applicationTime.valueOf(),
+                var msCurrent = this.earthModel.applicationTime.valueOf(),
                     msNew = msCurrent + (minutes * 60000);
                 this.changeDateTime(new Date(msNew));
             },
@@ -173,7 +173,7 @@ define(['model/Constants',
              * @returns {Terrain} Explorer.model.viewpoint.target}
              */
             getTargetTerrain: function () {
-                return this.model.viewpoint.target;
+                return this.earthModel.viewpoint.target;
             },
             /**
              * Restores all the persistant data from a previous session.
@@ -208,7 +208,7 @@ define(['model/Constants',
                 settings.saveSessionSettings(this);
             },
             /**
-             * Updates the model with current globe viewpoint.
+             * Updates the view model with current globe viewpoint.
              */
             updateSpatialData: function () {
                 var wwd = this.wwd,
@@ -218,22 +218,25 @@ define(['model/Constants',
                 // Use the mouse point when we've received at least one mouse event. Otherwise assume that we're
                 // on a touch device and use the center of the World Window's canvas.
                 if (!mousePoint) {
-                    this.model.updateMousePosition(centerPoint);
+                    this.earthModel.updateMousePosition(centerPoint);
                 } else if (wwd.viewport.containsPoint(mousePoint)) {
-                    this.model.updateMousePosition(mousePoint);
+                    this.earthModel.updateMousePosition(mousePoint);
                 }
                 // Update the viewpoint
                 if (!this.isAnimating) {
-                    this.model.updateEyePosition();
+                    this.earthModel.updateEyePosition();
                 }
             },
+            /**
+             * handleRedraw updates the spatial view models.
+             */
             handleRedraw: function () {
                 var self = this;
                 if (self.updateTimeout) {
                     return; // we've already scheduled an update; ignore redundant redraw events
                 }
-
                 self.updateTimeout = window.setTimeout(function () {
+                    // Update the geospatial view models
                     self.updateSpatialData();
                     self.updateTimeout = null;
                 }, self.updateInterval);

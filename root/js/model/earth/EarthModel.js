@@ -19,7 +19,7 @@
  */
 define([
     'knockout',
-    'model/Events',
+    '../Events',
     'model/util/Log',
     'model/util/Publisher',
     'model/sun/SolarData',
@@ -41,12 +41,12 @@ define([
         ww) {
         "use strict";
         /**
-         * Creates a Model object that's associated with the given Earth object.
+         * Creates an EarthModel object from the given Earth object.
          * @constructor
          * @param {Earth} earth The earth globe.
-         * @returns {Model}
+         * @returns {EarthModel}
          */
-        var Model = function (earth) {
+        var EarthModel = function (earth) {
             // Mix-in Publisher capability (publish/subscribe pattern)
             publisher.makePublisher(this);
             var self = this;
@@ -87,7 +87,7 @@ define([
          * 
          * @param {Date} time
          */
-        Model.prototype.updateAppTime = function (time) {
+        EarthModel.prototype.updateAppTime = function (time) {
             if (this.applicationTime.valueOf() === time.valueOf()) {
                 return;
             }
@@ -122,7 +122,7 @@ define([
         /**
          * Updates model propeties associated with the globe's view.
          */
-        Model.prototype.updateEyePosition = function () {
+        EarthModel.prototype.updateEyePosition = function () {
             var self = this,
                 viewpoint = this.earth.getViewpoint(),
                 target = viewpoint.target;
@@ -157,7 +157,7 @@ define([
          * 
          * @param {Vec2} mousePoint Mouse point or touchpoint coordiantes.
          */
-        Model.prototype.updateMousePosition = function (mousePoint) {
+        EarthModel.prototype.updateMousePosition = function (mousePoint) {
             if (mousePoint.equals(this.lastMousePoint)) {
                 return;
             }
@@ -176,7 +176,7 @@ define([
          * 
          * @param {Sunlight} sunlight JSON Sunlight object.
          */
-        Model.prototype.handleSunlight = function (sunlight) {
+        EarthModel.prototype.handleSunlight = function (sunlight) {
             this.sunlight = sunlight;
             // Reset our "processing flag"
             this.processingSunlight = false;
@@ -193,7 +193,7 @@ define([
             }
         };
 
-        Model.prototype.updateSunlight = function (time, latitude, longitude) {
+        EarthModel.prototype.updateSunlight = function (time, latitude, longitude) {
             var observer = {latitude: latitude, longitude: longitude, elevation: 0},
             sd = new SolarData(time, -(time.getTimezoneOffset() / 60), observer);
 
@@ -212,6 +212,6 @@ define([
             this.lastSolarTarget.longitude = longitude;
         }
 
-        return Model;
+        return EarthModel;
     }
 );
