@@ -57,17 +57,17 @@ requirejs.config({
  * @param {OracleJet} oj
  * @param {Knockout} ko
  * @param {JQuery} $
+ * @param {Constants} constants
  * @param {Explorer} explorer
  * @param {ExplorerApp} app
  * @param {WorldWind} ww
- * @returns {undefined}
  */
-require(['ojs/ojcore', 'knockout', 'jquery', 'model/Explorer', 'model/ExplorerApp', 'worldwind',
+require(['ojs/ojcore', 'knockout', 'jquery', 'model/Constants','model/Explorer', 'model/ExplorerApp', 'worldwind',
         'ojs/ojknockout', 'ojs/ojrouter', 'ojs/ojmodule', 'ojs/ojoffcanvas', 'ojs/ojnavigationlist', 'ojs/ojarraytabledatasource'],
-    function (oj, ko, $, explorer, app, ww) { // this callback gets executed when all required modules are loaded
+    function (oj, ko, $, constants, explorer, app, ww) { // this callback gets executed when all required modules are loaded
 
         // Specify the where the World Wind resources are located.
-        ww.configuration.baseUrl = explorer.WORLD_WIND_PATH;
+        ww.configuration.baseUrl = constants.WORLD_WIND_PATH;
         // Set the logging level for the World Wind library
         ww.Logger.setLoggingLevel(ww.Logger.LEVEL_WARNING);
 
