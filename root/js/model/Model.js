@@ -8,29 +8,29 @@
 
 /**
  * @param {Knockout} ko
+ * @param {Events} events Event constants.
  * @param {Log} log
  * @param {Publisher} publisher object
  * @param {Terrain} Terrain module
  * @param {Viewpoint} Viewpoint module
  * @param {WmtUtil} util object
- * @param {Explorer} explorer object
  * @param {WorldWind} ww
  * @returns {Model}
  */
 define([
     'knockout',
+    'model/Events',
     'model/util/Log',
-    'model/model/MarkerManager',
     'model/util/Publisher',
     'model/sun/SolarData',
     'model/sun/SolarPositionAlgorithm',
     'model/earth/Terrain',
     'model/earth/Viewpoint',
     'model/util/WmtUtil',
-    'model/Explorer',
     'worldwind'],
     function (
         ko,
+        events,
         log,
         publisher,
         SolarData,
@@ -38,7 +38,6 @@ define([
         Terrain,
         Viewpoint,
         util,
-        explorer,
         ww) {
         "use strict";
         /**
@@ -117,7 +116,7 @@ define([
             log.info("Model", "updateAppTime", time.toLocaleString());
 
             this.applicationTime = time;
-            this.fire(explorer.EVENT_TIME_CHANGED, time);
+            this.fire(events.EVENT_TIME_CHANGED, time);
         };
 
         /**
@@ -149,7 +148,7 @@ define([
 
 
             // Update viewpointChanged subscribers
-            this.fire(explorer.EVENT_VIEWPOINT_CHANGED, viewpoint);
+            this.fire(events.EVENT_VIEWPOINT_CHANGED, viewpoint);
         };
 
 
@@ -168,7 +167,7 @@ define([
             // Persist a copy of the terrain in our model for non-subscribers
             this.terrainAtMouse.copy(terrain);
             // Update subscribers
-            this.fire(explorer.EVENT_MOUSE_MOVED, terrain);
+            this.fire(events.EVENT_MOUSE_MOVED, terrain);
         };
 
 
@@ -184,7 +183,7 @@ define([
             //log.info("Model", "handleSunlight", "Sunrise: " + sunlight.sunriseTime + ", Sunset: " + sunlight.sunsetTime);
 
             // Update sunlightChanged subscribers
-            this.fire(explorer.EVENT_SUNLIGHT_CHANGED, sunlight);
+            this.fire(events.EVENT_SUNLIGHT_CHANGED, sunlight);
 
             // If there's a pending request, initiate another update
             if (this.pendingSolarTime) {
