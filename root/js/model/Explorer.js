@@ -4,19 +4,36 @@
  * http://www.opensource.org/licenses/mit-license
  */
 
-
 /*global define*/
 
 /**
- * Explorer Configuration and constants
+ * Explorer singleton and constants.
+ *
+ * @param {Constants} constants singleton
+ * @param {Log} log singleton
+ * @param {Messenger} messenger singleton
+ * @param {Model} Model module
+ * @param {Settings} settings singleton
+ * @param {WorldWind} ww
+ *
+ * @returns {Explorer}
  *
  * @author Bruce Schubert
  */
-define([],
-    function () {
+define(['model/Constants',
+        'model/util/Log',
+        'model/util/Messenger',
+        'model/Model',
+        'model/util/Settings',
+        'worldwind'],
+    function (constants,
+              log,
+              messenger,
+              Model,
+              settings) {
         "use strict";
         /**
-         * This is the top-level Explorer module. It is global.
+         * This is the top-level Explorer singleton.
          * @exports Explorer
          * @global
          */
@@ -25,99 +42,214 @@ define([],
              * The Explorer version number.
              * @constant
              */
-            VERSION: "0.4.0",
-            BUTTON_TEXT_CANCEL: 'Cancel',
-            BUTTON_TEXT_DELETE: 'Delete',
-            BUTTON_TEXT_GOTO: 'Go To',
-            BUTTON_TEXT_NO: 'No',
-            BUTTON_TEXT_OK: 'OK',
-            BUTTON_TEXT_SAVE: 'Save',
-            BUTTON_TEXT_YES: 'Yes',
-            EVENT_MARKER_ADDED: "markerAdded",
-            EVENT_MARKER_CHANGED: "markerChanged",
-            EVENT_MARKER_REMOVED: "markerRemoved",
+            VERSION: "0.1.0",
             /**
-             * Publish/subscibe event name for notifcation of mouse position on the globe.
-             * @constant
+             * Prepares the singleton Explorer object for use.
+             * @param {Earth} earth
              */
-            EVENT_MOUSE_MOVED: "mouseMoved",
-            EVENT_OBJECT_OPENED: "objectOpened",
-            EVENT_OBJECT_CHANGED: "objectChanged",
-            EVENT_OBJECT_MOVE_STARTED: "objectMoveStarted",
-            EVENT_OBJECT_MOVED: "objectMoved",
-            EVENT_OBJECT_MOVE_FINISHED: "objectMoveFinished",
-            EVENT_OBJECT_REMOVED: "objectRemoved",
-            EVENT_OBJECT_SELECTED: "objectSelected",
-            EVENT_PLACE_CHANGED: "placeChanged",
-            /**
-             * Publish/subscibe event name for notifcation of changes in the sunlight.
-             * @constant
-             */
-            EVENT_SUNLIGHT_CHANGED: "sunlightChanged",
-            EVENT_SURFACEFUEL_CHANGED: "surfaceFuelChanged",
-            EVENT_SURFACEFIRE_CHANGED: "surfaceFireChanged",
-            EVENT_TERRAIN_CHANGED: "terrainChanged",
-            /**
-             * Publish/subscibe event name for notifcation of changes in the application time.
-             * @constant
-             */
-            EVENT_TIME_CHANGED: "timeChanged",
-            /**
-             * Publish/subscribe event name for notification of changes in the globe viewpoint.
-             * @constant
-             */
-            EVENT_VIEWPOINT_CHANGED: "viewpointChanged",
-            GEOMETRY_POINT: 'point',
-            GEOMETRY_POLYGON: 'polygon',
-            GEOMETRY_POLYLINE: 'polyline',
-            GEOMETRY_UNKNOWN: 'unknown',
-            /**
-             * Base URL for WMT application images. (Do not use a relative path.)
-             */
-            IMAGE_PATH: "js/wmt/images/",
-            /**
-             * Layer categories
-             */
-            LAYER_CATEGORY_BACKGROUND: "Background",
-            LAYER_CATEGORY_BASE: "Base",
-            LAYER_CATEGORY_DATA: "Data",
-            LAYER_CATEGORY_OVERLAY: "Overlay",
-            LAYER_CATEGORY_WIDGET: "Widget",
-            /**
-             * The display name for the layer that displays markers.
-             */
-            LAYER_NAME_COMPASS: "Compass",
-            LAYER_NAME_MARKERS: "Markers",
-            LAYER_NAME_RETICLE: "Crosshairs",
-            LAYER_NAME_SKY: "Sky",
-            LAYER_NAME_VIEW_CONTROLS: "Controls",
-            MARKER_LABEL_LATLON: "markerLabelLatLon",
-            MARKER_LABEL_NAME: "markerLabelName",
-            MARKER_LABEL_NONE: "markerLabelNone",
-            MARKER_LABEL_PLACE: "markerLabelPlace",
-            /**
-             * The maximum range that the globe can be zoomed out to.
-             * @default 20,000,000 meters.
-             */
-            NAVIGATOR_MAX_RANGE: 20000000,
-            PROJECTION_NAME_3D: "3D",
-            PROJECTION_NAME_EQ_RECT: "Equirectangular",
-            PROJECTION_NAME_MERCATOR: "Mercator",
-            PROJECTION_NAME_NORTH_POLAR: "North Polar",
-            PROJECTION_NAME_SOUTH_POLAR: "South Polar",
-            PROJECTION_NAME_NORTH_UPS: "North UPS",
-            PROJECTION_NAME_SOUTH_UPS: "South UPS",
-            /**
-             * The local storage key for markers.
-             */
-            STORAGE_KEY_MARKERS: "markers",
-            /**
-             * Base URL for Web World Wind SDK. (Do not use a relative path.)
-             * @default "js/libs/webworldwind/"
-             * @constant
-             */
-            WORLD_WIND_PATH: "js/libs/webworldwind/"
+            initialize: function (earth) {
+                // The WorldWindow (globe) provides the spatial input 
+                this.earth = earth;
+                this.wwd = earth.wwd;
 
+                this.goToAnimator = new WorldWind.GoToAnimator(this.wwd);
+                this.isAnimating = false;
+
+                // Create the MVC Model on the primary globe
+                this.model = new Model(this.earth);
+
+                // Internal. Intentionally not documented.
+                this.updateTimeout = null;
+                this.updateInterval = 50;
+
+                // Counters used to display conditional messages
+                this.markerDnDCount = 0;
+
+                // Setup to update each time the World Window is repainted.
+                var self = this;
+                this.wwd.redrawCallbacks.push(function () {
+                    self.handleRedraw();
+                });
+
+                // Initialize the model with current time
+                this.changeDateTime(new Date());
+
+                // Setup to track the cursor position relative to the World Window's canvas. Listen to touch events in order
+                // to recognize and ignore simulated mouse events in mobile browsers.
+                window.addEventListener("mousemove", function (event) {
+                    self.handleMouseEvent(event);
+                });
+                window.addEventListener("touchstart", function (event) {
+                    self.handleTouchEvent(event);
+                });
+
+            },
+            /**
+             * Starts a drag-n-drop operation that creates the given marker on the globe at the drop point.
+             * @param {Object} marker A marker node.
+             */
+            dropMarkerOnGlobe: function (marker) {
+                var self = this,
+                    onDropCallback;
+
+                if (this.markerDnDCount < 1) {
+                    this.markerDnDCount++;
+                    messenger.infoGrowl("Click on the globe to place the marker.", "Instructions");
+                }
+                // This callback function is invoked when the DnD drop is completed. DnD updates the marker's lat/lon
+                onDropCallback = function (marker) {
+                    //self.model.markerManager.addMarker(marker);
+                };
+                // Start the DnD for the marker with the callback
+                this.earth.dndController.armDrop(marker, onDropCallback);
+            },
+            /**
+             *
+             * @param {Number} latitude
+             * @param {Number} longitude
+             * @param {Object} params
+             */
+            identifyFeaturesAtLatLon: function (latitude, longitude, params) {
+                var arg = params || {};
+
+                if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+                    log.error("Explorer", "identifyFeaturesAtLatLon", "Invalid Latitude and/or Longitude.");
+                    return;
+                }
+                //geoMacResource.identifyPoint(latitude, longitude, arg.layerId, function (json) {
+                //
+                //});
+
+            },
+            /**
+             * Centers the globe on the given lat/lon via animation.
+             * @param {Number} latitude
+             * @param {Number} longitude
+             * @param {Number} eyeAltitude
+             */
+            lookAtLatLon: function (latitude, longitude, eyeAltitude) {
+                if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+                    log.error("Explorer", "lookAtLatLon", "Invalid Latitude and/or Longitude.");
+                    return;
+                }
+                // TODO: Make AGL and MSL elevations a function of the model
+                // TODO: Eye Position a property of the model
+                // 
+                var self = this,
+                    eyeAltMsl = this.model.viewpoint.eye.altitude,
+                    eyePosGrdElev = this.earth.terrainProvider.elevationAtLatLon(this.model.viewpoint.eye.latitude, this.model.viewpoint.eye.longitude),
+                    tgtPosElev = this.earth.terrainProvider.elevationAtLatLon(latitude, longitude),
+                    eyeAltAgl = eyeAltitude || Math.max(eyeAltMsl - eyePosGrdElev, 100),
+                    tgtEyeAltMsl = Math.max(tgtPosElev + eyeAltAgl, 100);
+
+                // HACK: Force the view to nadir to avoid bug where navigator looks at target at 0 MSL.
+                // This will establish the crosshairs on the target.
+                this.wwd.navigator.range = eyeAltMsl;
+                this.wwd.navigator.tilt = 0;
+                this.wwd.redraw();
+
+                this.earth.goto(latitude, longitude, tgtEyeAltMsl, function () {
+                    self.updateSpatialData();
+                });
+            },
+            /**
+             * Updates the model with the given time.
+             * @param {Date} date
+             */
+            changeDateTime: function (date) {
+                this.model.updateAppTime(date);
+            },
+            /**
+             * Updates the model with the an adjusted time (+/- minutues).
+             * @param {Number} minutes The number of minutes (+/-) added or subtracted from the current application time.
+             */
+            incrementDateTime: function (minutes) {
+                var msCurrent = this.model.applicationTime.valueOf(),
+                    msNew = msCurrent + (minutes * 60000);
+                this.changeDateTime(new Date(msNew));
+            },
+            /**
+             * Returns the terrain at the reticule.
+             * @returns {Terrain} Explorer.model.viewpoint.target}
+             */
+            getTargetTerrain: function () {
+                return this.model.viewpoint.target;
+            },
+            /**
+             * Restores all the persistant data from a previous session.
+             * This method must be called after World Wind has finished
+             * updating. See the use Pace.on("done",...) in WmtClient.
+             */
+            restoreSession: function () {
+                log.info('Explorer', 'restoreSession', 'Restoring the model and view.');
+                //this.model.markerManager.restoreMarkers();
+                this.restoreSessionView();
+                // Update all time sensitive objects
+                this.changeDateTime(new Date());
+
+                // Force a refresh now that everything is setup.
+                this.earth.redraw();
+            },
+            // Internal method
+            restoreSessionView: function () {
+                settings.restoreSessionSettings(this);
+            },
+            /**
+             * Saves the current session to the persistent store.
+             * See the call to window.onUnload(...) in WmtClient.
+             */
+            saveSession: function () {
+                log.info('Explorer', 'saveSession', 'Saving the model and view.');
+                this.saveSessionView();
+                //this.model.markerManager.saveMarkers();
+            },
+            // Internal method.
+            saveSessionView: function () {
+                settings.saveSessionSettings(this);
+            },
+            /**
+             * Updates the model with current globe viewpoint.
+             */
+            updateSpatialData: function () {
+                var wwd = this.wwd,
+                    mousePoint = this.mousePoint,
+                    centerPoint = new WorldWind.Vec2(wwd.canvas.width / 2, wwd.canvas.height / 2);
+
+                // Use the mouse point when we've received at least one mouse event. Otherwise assume that we're
+                // on a touch device and use the center of the World Window's canvas.
+                if (!mousePoint) {
+                    this.model.updateMousePosition(centerPoint);
+                } else if (wwd.viewport.containsPoint(mousePoint)) {
+                    this.model.updateMousePosition(mousePoint);
+                }
+                // Update the viewpoint
+                if (!this.isAnimating) {
+                    this.model.updateEyePosition();
+                }
+            },
+            handleRedraw: function () {
+                var self = this;
+                if (self.updateTimeout) {
+                    return; // we've already scheduled an update; ignore redundant redraw events
+                }
+
+                self.updateTimeout = window.setTimeout(function () {
+                    self.updateSpatialData();
+                    self.updateTimeout = null;
+                }, self.updateInterval);
+            },
+            handleMouseEvent: function (event) {
+                if (this.isTouchDevice) {
+                    return; // ignore simulated mouse events in mobile browsers
+                }
+                this.mousePoint = this.wwd.canvasCoordinates(event.clientX, event.clientY);
+                this.wwd.redraw();
+            },
+            //noinspection JSUnusedLocalSymbols
+            handleTouchEvent: function () {
+                this.isTouchDevice = true; // suppress simulated mouse events in mobile browsers
+                this.mousePoint = null;
+            }
         };
         /**
          * Holds configuration parameters for WWE. Applications may modify these parameters prior to creating
@@ -136,7 +268,7 @@ define([],
          */
         Explorer.configuration = {
             imageryDetailHint: (window.screen.width < 768 ? -0.1 : (window.screen.width < 1024 ? 0.0 : (window.screen.width < 1280 ? 0.1 : 0.2))),
-            markerLabels: Explorer.MARKER_LABEL_NAME,
+            markerLabels: constants.MARKER_LABEL_NAME,
             startupLatitude: 34.29,
             startupLongitude: -119.29,
             startupAltitude: 1000000,
@@ -147,7 +279,7 @@ define([],
             showExaggerationControl: false,
             showFieldOfViewControl: false,
             terrainSampleRadius: 30,
-            viewControlOrientation: "vertical",
+            viewControlOrientation: "vertical"
         };
 
         return Explorer;
