@@ -58,12 +58,6 @@ define([], function () {
          * The local storage key for markers.
          */
         STORAGE_KEY_MARKERS: "markers",
-        /**
-         * Base URL for Web World Wind SDK. (Do not use a relative path.)
-         * @default "js/libs/webworldwind/"
-         * @constant
-         */
-        WORLD_WIND_PATH: "http://worldwindserver.net/webworldwind/"
     }
 
     return Constants;
