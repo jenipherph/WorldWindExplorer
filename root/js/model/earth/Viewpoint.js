@@ -93,7 +93,7 @@ define([
                 + this.eye.longitude.toString() + "\u00b0, "
                 + this.eye.altitude.toString() + "m, "
                 + this.target.latitude.toString() + "\u00b0, "
-                + this.target.ongitude.toString() + "\u00b0, "
+                + this.target.longitude.toString() + "\u00b0, "
                 + this.target.elevation.toString() + "m, "
                 + this.target.aspect.toString() + "\u00b0, "
                 + this.target.slope.toString() + "\u00b0)";
