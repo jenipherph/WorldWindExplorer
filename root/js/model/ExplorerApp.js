@@ -4,7 +4,6 @@
  * http://www.opensource.org/licenses/mit-license
  */
 
-
 /*global define, WorldWind*/
 
 /**
@@ -21,14 +20,11 @@
  *
  * @author Bruce Schubert
  */
-define([
-        'ojs/ojcore', 'knockout', 'jquery',
-        'model/earth/Earth',
+define(['model/earth/Earth',
         'model/Explorer',
         'worldwind'
     ],
-    function (oj, ko, $,
-              Earth,
+    function (Earth,
               explorer) {
         "use strict";
         var ExplorerApp = function () {
@@ -47,50 +43,49 @@ define([
             };
 
             // Create the explorer's primary globe that's associated with the specified HTML5 canvas
-            explorer.earth = new Earth("canvasOne", globeOptions);
-
+            var earth = new Earth("canvasOne", globeOptions);
             // Configure the Earth's layers
-            explorer.earth.layerManager.addBaseLayer(new WorldWind.BMNGLayer(), {
+            earth.layerManager.addBaseLayer(new WorldWind.BMNGLayer(), {
                 enabled: true,
                 hideInMenu: true,
                 detailHint: explorer.configuration.imageryDetailHint
             });
-            explorer.earth.layerManager.addBaseLayer(new WorldWind.BMNGLandsatLayer(), {
+            earth.layerManager.addBaseLayer(new WorldWind.BMNGLandsatLayer(), {
                 enabled: false,
                 detailHint: explorer.configuration.imageryDetailHint
             });
-            explorer.earth.layerManager.addBaseLayer(new WorldWind.BingAerialWithLabelsLayer(null), {
+            earth.layerManager.addBaseLayer(new WorldWind.BingAerialWithLabelsLayer(null), {
                 enabled: false,
                 detailHint: explorer.configuration.imageryDetailHint
             });
-            explorer.earth.layerManager.addBaseLayer(new WorldWind.BingRoadsLayer(null), {
+            earth.layerManager.addBaseLayer(new WorldWind.BingRoadsLayer(null), {
                 enabled: false,
                 opacity: 0.7,
                 detailHint: explorer.configuration.imageryDetailHint
             });
-            explorer.earth.layerManager.addBaseLayer(new WorldWind.OpenStreetMapImageLayer(null), {
+            earth.layerManager.addBaseLayer(new WorldWind.OpenStreetMapImageLayer(null), {
                 enabled: true,
                 opacity: 0.7,
                 detailHint: explorer.configuration.imageryDetailHint
             });
-            explorer.earth.layerManager.addDataLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_MARKERS), {
+            earth.layerManager.addDataLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_MARKERS), {
                 enabled: true,
                 pickEnabled: true
             });
-            explorer.earth.layerManager.addWidgetLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_WIDGETS), {
+            earth.layerManager.addWidgetLayer(new WorldWind.RenderableLayer(explorer.LAYER_NAME_WIDGETS), {
                 enabled: true,
                 pickEnabled: false
             });
 
 
-            // Now that the globe is setup, initialize the Model-View-Controller framework.
-            // The controller will create model and the views on the primary globe. 
-//            controller.initialize(this.earth);
+            // Now that the earth globe is setup, initialize the Model-View-Controller framework.
+            // The explorer will create model and the view models on the primary globe.
+            explorer.initialize(earth);
 
 
             // Add event handler to save the current view (eye position) when the window closes
             window.onbeforeunload = function () {
-//                controller.saveSession();
+                explorer.saveSession();
                 // Return null to close quietly on Chrome FireFox.
                 //return "Close WMT?";
                 return null;
@@ -100,7 +95,7 @@ define([
             // But wait for the globe (specically the elevation model) to finish 
             // loading before adding placemarks, else the terrain data will be
             // inaccurate.
-//            controller.restoreSession();
+            explorer.restoreSession();
         };
 
         return ExplorerApp;
