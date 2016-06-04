@@ -13,8 +13,9 @@
  * @param {OracleJet} oj
  * @param {KnockOut} ko
  * @param {JQuery} $
- * @param {Earth} Earth The globe.
- * @param {Explorer} explorer Constants.
+ * @param {Earth} Earth the globe
+ * @param {Explorer} explorer
+ * @param {WorldWind} ww
  *
  * @returns {ExplorerApp}
  *
@@ -23,7 +24,8 @@
 define([
         'ojs/ojcore', 'knockout', 'jquery',
         'model/earth/Earth',
-        'model/Explorer'
+        'model/Explorer',
+        'worldwind'
     ],
     function (oj, ko, $,
               Earth,
@@ -31,7 +33,7 @@ define([
         "use strict";
         var ExplorerApp = function () {
 
-            // Create the primary globe
+            // Define the configuration for the primary globe
             var globeOptions = {
                 showBackground: true,
                 showReticule: true,
@@ -43,7 +45,6 @@ define([
                 includeExaggerationControls: explorer.configuration.showExaggerationControl,
                 includeFieldOfViewControls: explorer.configuration.showFieldOfViewControl
             };
-
 
             // Create the explorer's primary globe that's associated with the specified HTML5 canvas
             explorer.earth = new Earth("canvasOne", globeOptions);
