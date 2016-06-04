@@ -12,20 +12,20 @@
  * 
  * @param {Crosshairs} Crosshairs
  * @param {Compass} Crosshairs
- * @param {Object} Wmt - Provides image path.
- * @param {Object} WorldWind
+ * @param {Constants} constants Provides image path.
+ * @param {WorldWind} WorldWind
  * @returns {ReticuleLayer}
  */
 
 define([
     'model/earth/Compass',
     'model/earth/Crosshairs',
-    'model/Explorer',
+    'model/Constants',
     'worldwind'],
     function (
         Compass,
         Crosshairs,
-        Wmt,
+        constants,
         ww) {
         "use strict";
 
@@ -42,7 +42,7 @@ define([
 
             // The compass has been superceded by the LocationWidget
             //this._compass = new Compass(Wmt.IMAGE_PATH);
-            this._reticule = new Crosshairs(Wmt.IMAGE_PATH);
+            this._reticule = new Crosshairs(constants.IMAGE_PATH);
 
             // Put crosshairs on top of the globe
             this.addRenderable(this._reticule);
