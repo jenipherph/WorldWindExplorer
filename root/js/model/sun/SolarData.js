@@ -37,7 +37,7 @@ define([],
          * @param {type} terrain
          * @param {type} temperature
          * @param {type} pressure
-         * @returns {SolarData_L31.SolarData}
+         * @returns {SolarData}
          */
         var SolarData = function (localTime, utcOffset, observer, terrain, temperature, pressure) {
 
