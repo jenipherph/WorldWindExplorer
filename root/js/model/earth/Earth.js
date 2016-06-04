@@ -22,8 +22,8 @@
  * @param {Terrain} Terrain Aspect, slope and elevation.
  * @param {TerrainProvider} TerrainProvider Provides terrain data.
  * @param {Viewpoint} Viewpoint Eye position and target terrain.
- * @param {Wmt} explorer Constants.
- * @param {WorldWind} ww
+ * @param {Explorer} explorer Constants.
+ * @param {WorldWind} ww Web World Wind.
  * @returns {Earth}
  *
  * @author Bruce Schubert
