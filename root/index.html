@@ -78,13 +78,13 @@
                         </div>
 
                         <!--
-                        Branding.
-                        The OracleJET QuickStart template places this section in the
-                        header.html, I moved it to index.html so that the branding displays
+                        Branding
+                          The OracleJET QuickStart template places this section in the
+                        header.html; I moved it to index.html so that the branding displays
                         right away, during the application startup.
                         -->
                         <div class="oj-flex-bar-middle oj-sm-align-items-center">
-                            <span role="img" class="oj-sm-only-hide oj-icon branding-icon" title="NASA Logo"></span>
+                            <span role="img" class="oj-sm-only-hide oj-icon branding-icon" title="App Logo"></span>
                             <span class="oj-web-applayout-header-title"
                                   title="Application Name">World Wind Explorer</span>
                         </div>
@@ -103,15 +103,16 @@
                         Main Sidebar
                         -->
                         <div class="oj-xl-3 oj-lg-3 oj-sm-12 oj-flex-item oj-flex">
+                            <!--
+                             We're using an ojModule to bind the main content to a router state. Use ojModule when the
+                             module name is the router state. When the router changes state, ojModule will automatically
+                             load and render the content of a new module based on the name specified in the value or id
+                             property of the current RouterState.  See the router configuration in main.js.
+                            -->
                             <div id="mainContent" role="main" class="oj-panel oj-margin oj-flex-item"
                                  data-bind="ojModule: router.moduleConfig">
                                 <!--
-                                ** This ojModule binding is using "name" instead of "viewName".
-                                ** See the router configuration RootViewModel in main.js.
-                                ** When the "name" option is specified, ojModule expects that
-                                ** the View and the ViewModel share the same base name.
-                                ** The "viewName" option is used when the View does not have
-                                ** an associated ViewModel or when the ViewModel has a different base name.
+                                E.g., Location, Layers, Markers, Settings or Help modules display here.
                                 -->
                             </div>
                         </div>
