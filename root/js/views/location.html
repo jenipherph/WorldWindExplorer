@@ -3,22 +3,43 @@
  The MIT License: http://www.opensource.org/licenses/mit-license.php
 -->
 
-<!--Template for the Home view-->
-
-<h1>              
-    <span class="fa fa-crosshairs fa-lg" aria-hidden="true" style="padding-right:5px;"></span>
-    Location
-</h1>
-<ul>
-<!--    
-    <li>Latitude: <span data-bind="text: eyePosLatitude().toString()"></span></li>
-    <li>Longitude: <span data-bind="text: eyePosLongitude().toString()"></span></li>
+<!--
+This location template is bound to the view model of the same name
 -->
-    <li>Latitude:</li>
-    <li>Longitude:</li>
-    <li>Time zone</li>
-    <li>Time</li>
-    <li>Sunrise</li>
-    <li>Sunset</li>
-    <li>Solar Angles</li>
-</ul>
+<div data-bind="ojComponent: {component: 'ojCollapsible', expanded: true}">
+    <h1>
+        <span class="fa fa-crosshairs fa-lg" aria-hidden="true" style="padding-right:5px;"></span>
+        Location
+    </h1>
+    <div id="locationLayout" data-bind="ojComponent: {component: 'ojMasonryLayout'}">
+        <div class="oj-panel oj-margin oj-masonrylayout-tile-1x1">
+            <h3 class="oj-header-border">Coordinates</h3>
+            <h4><span data-bind="text: eyePosLatitude().toString()"></span></h4>
+            <h4><span data-bind="text: eyePosLongitude().toString()"></span></h4>
+        </div>
+
+
+        <div class="oj-panel oj-panel-alt1  oj-masonrylayout-tile-1x1 oj-margin">
+            <h3 class="oj-header-border">Time</h3>
+            <li>Time zone</li>
+            <li>Time</li>
+        </div>
+
+        <div class="oj-panel oj-panel-alt1  oj-masonrylayout-tile-1x1 oj-margin">
+            <h3 class="oj-header-border">Sunlight</h3>
+            <li>Time zone</li>
+            <li>Time</li>
+        </div>
+
+
+        <div class="oj-panel oj-panel-alt2  oj-masonrylayout-tile-1x1 oj-margin ">
+            <div data-bind="ojComponent: {component: 'ojCollapsible', expanded: true}">
+                <h3>Terrain</h3>
+                <div>
+                    <p>I'm a collapsible inside a panel</p>
+                    When you close the collapsible the panel will shrink.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

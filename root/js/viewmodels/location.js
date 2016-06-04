@@ -12,19 +12,20 @@
  * @param {Explorer} explorer
  * @returns {LocationViewModel}
  */
-define(['ojs/ojcore', 'knockout', 'model/Explorer'],
+define(['ojs/ojcore', 'knockout',
+        'model/Explorer',
+        'ojs/ojcollapsible', 'ojs/ojmasonrylayout'],
     function (oj, ko, explorer) {
-
         /**
          * Constructs a LocationViewModel.
          * @returns {LocationViewModel} A new instance.
          */
         function LocationViewModel() {
-            var earth = explorer.earth;
+            var model = explorer.earthModel;
+            var self = this;
 
-//            var model = controller.model;
-//            this.eyePosLatitude = model.viewModel.eyePosLatitude;
-//            this.eyePosLongitude = model.viewModel.eyePosLongitude;
+            this.eyePosLatitude = model.viewModel.eyePosLatitude;
+            this.eyePosLongitude = model.viewModel.eyePosLongitude;
         }
 
         return LocationViewModel;
