@@ -7,29 +7,29 @@
 /*global define*/
 
 /**
- * The LayerManager manages categorical, observable lists of Layer objects. It itself observable, 
+ * The LayerManager manages categorical, observable lists of Layer objects. It itself observable,
  * and it injects some observable properties into the individual Layer objects.
- * 
+ *
  * @param {Knockout} ko
- * @param {Explorer} explorer
+ * @param {Constants} constants
+ * @param {WorldWind} ww
  * @returns {LayerManager}
  */
-define([
-    'knockout',
-    'model/Explorer',
-    'worldwind'],
-    function (
-        ko,
-        explorer) {
+define(['knockout',
+        'model/Constants',
+        'worldwind'],
+    function (ko,
+              constants,
+              ww) {
         "use strict";
         /**
-         * 
-         * @param {Globe} globe
+         *
+         * @param {Earth} globe
          * @returns {LayerManager}
          */
         var LayerManager = function (globe) {
             var self = this;
-            
+
             this.globe = globe;
             /**
              * Background layers are always enabled and are not shown in the layer menu.
@@ -55,7 +55,7 @@ define([
 
             /**
              * Toggles a layer on and off.
-             * 
+             *
              * @param {WorldWind.Layer} layer The layer to be toggled on or off.
              */
             this.toggleLayer = function (layer) {
@@ -76,7 +76,10 @@ define([
         LayerManager.prototype.addBackgroundLayer = function (layer) {
             var index = this.backgroundLayers().length;
 
-            LayerManager.applyOptionsToLayer(layer, {hideInMenu: true, enabled: true}, explorer.LAYER_CATEGORY_BACKGROUND);
+            LayerManager.applyOptionsToLayer(layer, {
+                hideInMenu: true,
+                enabled: true
+            }, constants.LAYER_CATEGORY_BACKGROUND);
 
             this.globe.wwd.insertLayer(index, layer);
             this.backgroundLayers.push(layer);
@@ -90,14 +93,14 @@ define([
         LayerManager.prototype.addBaseLayer = function (layer, options) {
             var index = this.backgroundLayers().length + this.baseLayers().length;
 
-            LayerManager.applyOptionsToLayer(layer, options, explorer.LAYER_CATEGORY_BASE);
+            LayerManager.applyOptionsToLayer(layer, options, constants.LAYER_CATEGORY_BASE);
 
             this.globe.wwd.insertLayer(index, layer);
             this.baseLayers.push(layer);
         };
 
         /**
-         * Overlay layers may be translucent and/or contain sparce content, and 
+         * Overlay layers may be translucent and/or contain sparce content, and
          * may be stacked with other layers.
          * @param {WorldWind.Layer} layer
          * @param {Object} options
@@ -105,7 +108,7 @@ define([
         LayerManager.prototype.addOverlayLayer = function (layer, options) {
             var index = this.backgroundLayers().length + this.baseLayers().length + this.overlayLayers().length;
 
-            LayerManager.applyOptionsToLayer(layer, options, explorer.LAYER_CATEGORY_OVERLAY);
+            LayerManager.applyOptionsToLayer(layer, options, constants.LAYER_CATEGORY_OVERLAY);
 
             this.globe.wwd.insertLayer(index, layer);
             this.overlayLayers.push(layer);
@@ -120,7 +123,7 @@ define([
             var index = this.backgroundLayers().length + this.baseLayers().length + this.overlayLayers().length
                 + this.dataLayers().length;
 
-            LayerManager.applyOptionsToLayer(layer, options, explorer.LAYER_CATEGORY_DATA);
+            LayerManager.applyOptionsToLayer(layer, options, constants.LAYER_CATEGORY_DATA);
 
             this.globe.wwd.insertLayer(index, layer);
             this.dataLayers.push(layer);
@@ -134,7 +137,10 @@ define([
             var index = this.backgroundLayers().length + this.baseLayers().length + this.overlayLayers().length
                 + this.dataLayers().length + this.widgetLayers().length;
 
-            LayerManager.applyOptionsToLayer(layer, {hideInMenu: true, enabled: true}, explorer.LAYER_CATEGORY_BACKGROUND);
+            LayerManager.applyOptionsToLayer(layer, {
+                hideInMenu: true,
+                enabled: true
+            }, constants.LAYER_CATEGORY_BACKGROUND);
 
             this.globe.wwd.insertLayer(index, layer);
             this.widgetLayers.push(layer);
