@@ -7,12 +7,20 @@
 
 /*global define*/
 
+/**
+ * Viewpoint
+ * 
+ * @param {Log} log singleton
+ * @param {Terrain} Terrain module
+ * @param {WorldWind} ww WebWorldWind
+ * @returns {Viewpoint}
+ */
 define([
     'model/util/Log',
     'model/earth/Terrain',
     'worldwind'],
     function (
-        Log,
+        log,
         Terrain,
         ww) {
         "use strict";
@@ -28,11 +36,11 @@ define([
         var Viewpoint = function (eyePosition, targetTerrain) {
             if (!eyePosition) {
                 throw new WorldWind.ArgumentError(
-                    Log.error("Viewpoint", "constructor", "missingPosition"));
+                    log.error("Viewpoint", "constructor", "missingPosition"));
             }
             if (!targetTerrain) {
                 throw new WorldWind.ArgumentError(
-                    Log.error("Viewpoint", "constructor", "missingTerrain"));
+                    log.error("Viewpoint", "constructor", "missingTerrain"));
             }
             this.eye = new WorldWind.Position(eyePosition.latitude, eyePosition.longitude, eyePosition.altitude);
             this.target = new Terrain();
@@ -64,7 +72,7 @@ define([
         Viewpoint.prototype.copy = function (viewpoint) {
             if (!viewpoint) {
                 throw new WorldWind.ArgumentError(
-                    Log.error("Viewpoint", "copy", "missingViewpoint"));
+                    log.error("Viewpoint", "copy", "missingViewpoint"));
             }
             this.eye.copy(viewpoint.eye);
             this.target.copy(viewpoint.target);
@@ -89,7 +97,8 @@ define([
          * @returns {String}
          */
         Viewpoint.prototype.toString = function () {
-            return "(" + this.eye.latitude.toString() + "\u00b0, "
+            return "(" 
+                    + this.eye.latitude.toString() + "\u00b0, "
                 + this.eye.longitude.toString() + "\u00b0, "
                 + this.eye.altitude.toString() + "m, "
                 + this.target.latitude.toString() + "\u00b0, "
