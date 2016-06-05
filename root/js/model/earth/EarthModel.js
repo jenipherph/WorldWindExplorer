@@ -19,7 +19,7 @@
  */
 define([
     'knockout',
-    '../Events',
+    'model/Events',
     'model/util/Log',
     'model/util/Publisher',
     'model/sun/SolarData',
@@ -195,7 +195,7 @@ define([
 
         EarthModel.prototype.updateSunlight = function (time, latitude, longitude) {
             var observer = {latitude: latitude, longitude: longitude, elevation: 0},
-            sd = new SolarData(time, -(time.getTimezoneOffset() / 60), observer);
+                sd = new SolarData(time, -(time.getTimezoneOffset() / 60), observer);
 
             spa.calculate(sd);
 
