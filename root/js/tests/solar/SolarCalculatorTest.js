@@ -80,9 +80,9 @@ define(['model/sun/SolarCalculator', 'model/sun/SolarData', 'model/sun/SolarPosi
 
                     // Create the instance to be tested
                     var calc = new SolarCalculator();
-
                     for (var i = 0; i <= 365; i++) {
-                        var testDate = new Date(refDate.setTime(refDate.getTime() + i * 86400000));
+                        var testDate = new Date();
+                        testDate.setTime(refDate.getTime() + i * 86400000);
                         var testData = new SolarData(testDate, -7, observer, terrain, 11, 820);
 
                         // Generate expected test results 
