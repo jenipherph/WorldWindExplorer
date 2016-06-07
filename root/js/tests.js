@@ -11,7 +11,7 @@ require.config({
     shim: {
         'QUnit': {
             exports: 'QUnit',
-            init: function() {
+            init: function () {
                 QUnit.config.autoload = false;
                 QUnit.config.autostart = false;
             }
@@ -20,15 +20,17 @@ require.config({
 });
 
 // require the unit tests.
-require(
-    ['QUnit','tests/solar/SolarCalculatorTest'],
-    function(QUnit, SolarCalculatorTest ) {
-        // run the tests.
-        SolarCalculatorTest.run();
-        // start QUnit.
-        QUnit.load();
-        QUnit.start();
-    }
+require([
+    'QUnit',
+    'tests/solar/SolarCalculatorTest'],
+        function (QUnit, SolarCalculatorTest) {
+            // Run the tests.
+            SolarCalculatorTest.run();
+            
+            // Start QUnit.
+            QUnit.load();
+            QUnit.start();
+        }
 );
 
 
